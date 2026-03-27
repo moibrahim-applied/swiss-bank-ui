@@ -109,6 +109,24 @@ export default function SplashScreen({ language, onBegin }: SplashScreenProps) {
       >
         {t("splash.resume", language)}
       </motion.button>
+
+      {/* Powered by OPUS */}
+      <motion.div
+        className="absolute bottom-8 flex items-center gap-2"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 2.5, duration: 0.8 }}
+      >
+        <span className="text-xs text-bank-text-secondary/50 tracking-wide">Powered by</span>
+        <a
+          href="https://opus.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm font-semibold tracking-[0.08em] text-[#C9A84C] transition-opacity hover:opacity-80"
+        >
+          OPUS
+        </a>
+      </motion.div>
     </div>
   );
 }
