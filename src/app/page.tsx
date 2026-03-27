@@ -1,101 +1,175 @@
-import Image from "next/image";
+"use client";
+
+import { useState, useCallback } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Language, DemoPhase, DecisionType } from "@/lib/types";
+import SplashScreen from "@/components/splash/SplashScreen";
+import TopNav from "@/components/ui/TopNav";
+import PropertyDiscovery from "@/components/property/PropertyDiscovery";
+import DocumentUpload from "@/components/documents/DocumentUpload";
+import ProcessingView from "@/components/processing/ProcessingView";
+import MortgageOffer from "@/components/decision/MortgageOffer";
+import CustomerNotification from "@/components/communication/CustomerNotification";
+import CaseFile from "@/components/decision/CaseFile";
+import { t } from "@/lib/i18n";
+
+const phaseTransition = {
+  initial: { opacity: 0, x: 40 },
+  animate: { opacity: 1, x: 0, transition: { duration: 0.4, ease: [0, 0, 0.58, 1] as const } },
+  exit: { opacity: 0, x: -40, transition: { duration: 0.3, ease: [0.42, 0, 1, 1] as const } },
+};
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [phase, setPhase] = useState<DemoPhase>("splash");
+  const [language, setLanguage] = useState<Language>("en");
+  const [, setDecision] = useState<DecisionType>("GREEN");
+  const [sessionStart] = useState<Date>(new Date());
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+  const handleLanguageChange = useCallback((lang: Language) => {
+    setLanguage(lang);
+  }, []);
+
+  const goToPhase = useCallback((nextPhase: DemoPhase) => {
+    setPhase(nextPhase);
+  }, []);
+
+  const handleProcessingComplete = useCallback((d: DecisionType) => {
+    setDecision(d);
+    goToPhase("decision");
+  }, [goToPhase]);
+
+  const showNav = phase !== "splash";
+
+  return (
+    <main className="min-h-screen bg-bank-bg relative">
+      {/* Confidential Watermark */}
+      <div className="watermark">{t("nav.confidential", language)}</div>
+
+      {/* Top Navigation */}
+      {showNav && (
+        <motion.div
+          initial={{ opacity: 0, y: -48 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="fixed top-0 left-0 right-0 z-50"
         >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+          <TopNav
+            language={language}
+            onLanguageChange={handleLanguageChange}
+            referenceNumber="REF-2026-4817"
+            sessionStart={sessionStart}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+        </motion.div>
+      )}
+
+      {/* Phase Content */}
+      <div className={showNav ? "pt-12" : ""}>
+        <AnimatePresence mode="wait">
+          {phase === "splash" && (
+            <motion.div key="splash" {...phaseTransition}>
+              <SplashScreen
+                language={language}
+                onBegin={() => goToPhase("property")}
+              />
+            </motion.div>
+          )}
+
+          {phase === "property" && (
+            <motion.div key="property" {...phaseTransition}>
+              <div className="max-w-5xl mx-auto px-8 py-12">
+                <PropertyDiscovery
+                  language={language}
+                  onComplete={() => goToPhase("documents")}
+                />
+              </div>
+            </motion.div>
+          )}
+
+          {phase === "documents" && (
+            <motion.div key="documents" {...phaseTransition}>
+              <div className="max-w-6xl mx-auto px-8 py-12">
+                <DocumentUpload
+                  language={language}
+                  onComplete={() => goToPhase("processing")}
+                />
+              </div>
+            </motion.div>
+          )}
+
+          {phase === "processing" && (
+            <motion.div key="processing" {...phaseTransition}>
+              <ProcessingView
+                language={language}
+                onComplete={handleProcessingComplete}
+              />
+            </motion.div>
+          )}
+
+          {phase === "decision" && (
+            <motion.div key="decision" {...phaseTransition}>
+              <div className="max-w-5xl mx-auto px-8 py-12">
+                <MortgageOffer
+                  language={language}
+                  onComplete={() => goToPhase("communication")}
+                />
+              </div>
+            </motion.div>
+          )}
+
+          {phase === "communication" && (
+            <motion.div key="communication" {...phaseTransition}>
+              <div className="max-w-4xl mx-auto px-8 py-12">
+                <CustomerNotification
+                  language={language}
+                  onComplete={() => goToPhase("casefile")}
+                />
+              </div>
+            </motion.div>
+          )}
+
+          {phase === "casefile" && (
+            <motion.div key="casefile" {...phaseTransition}>
+              <div className="max-w-6xl mx-auto px-8 py-12">
+                <CaseFile
+                  language={language}
+                  onComplete={() => goToPhase("splash")}
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Demo Phase Indicator - presenter shortcut at bottom-right */}
+      {showNav && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed bottom-4 right-4 z-50 flex items-center gap-2"
         >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+          <div className="surface-button px-3 py-1.5 text-xs font-mono text-bank-text-secondary">
+            Phase: {phase.toUpperCase()}
+          </div>
+          {phase !== "processing" && (
+            <button
+              onClick={() => {
+                const phases: DemoPhase[] = [
+                  "splash", "property", "documents", "processing",
+                  "decision", "communication", "casefile"
+                ];
+                const idx = phases.indexOf(phase);
+                if (idx < phases.length - 1) {
+                  goToPhase(phases[idx + 1]);
+                }
+              }}
+              className="surface-button px-3 py-1.5 text-xs text-bank-gold hover:text-bank-text transition-colors"
+              title="Skip to next phase (presenter shortcut)"
+            >
+              Skip →
+            </button>
+          )}
+        </motion.div>
+      )}
+    </main>
   );
 }

@@ -2,26 +2,167 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bank-bg: #111827;
+  --bank-surface: #1F2937;
+  --bank-elevated: #374151;
+  --bank-gold: #C9A84C;
+  --bank-gold-dim: #A68A3E;
+  --bank-steel: #64748B;
+  --bank-emerald: #059669;
+  --bank-amber: #D97706;
+  --bank-crimson: #DC2626;
+  --bank-text: #F1F5F9;
+  --bank-text-secondary: #94A3B8;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bank-bg);
+  color: var(--bank-text);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+.font-institutional {
+  letter-spacing: 0.02em;
+  font-weight: 600;
+}
+
+.font-mono-data {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.gold-border-glow {
+  box-shadow: 0 0 12px rgba(201, 168, 76, 0.15), 0 0 4px rgba(201, 168, 76, 0.1);
+}
+
+.gold-focus-ring:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(201, 168, 76, 0.4);
+}
+
+.surface-raised {
+  background: #1F2937;
+  box-shadow:
+    6px 6px 12px rgba(0, 0, 0, 0.4),
+    -4px -4px 10px rgba(55, 65, 81, 0.3);
+  border-radius: 8px;
+}
+
+.surface-inset {
+  background: #1a2332;
+  box-shadow:
+    inset 4px 4px 8px rgba(0, 0, 0, 0.4),
+    inset -3px -3px 6px rgba(55, 65, 81, 0.2);
+  border-radius: 8px;
+}
+
+.surface-card {
+  background: linear-gradient(145deg, #222d3d, #1c2736);
+  box-shadow:
+    8px 8px 16px rgba(0, 0, 0, 0.35),
+    -6px -6px 14px rgba(55, 65, 81, 0.15);
+  border-radius: 12px;
+}
+
+.surface-button {
+  background: linear-gradient(145deg, #252f3f, #1e2838);
+  box-shadow:
+    4px 4px 8px rgba(0, 0, 0, 0.35),
+    -3px -3px 6px rgba(55, 65, 81, 0.15);
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.surface-button:hover {
+  box-shadow:
+    2px 2px 4px rgba(0, 0, 0, 0.35),
+    -2px -2px 4px rgba(55, 65, 81, 0.15);
+}
+
+.surface-button:active {
+  box-shadow:
+    inset 2px 2px 4px rgba(0, 0, 0, 0.3),
+    inset -2px -2px 4px rgba(55, 65, 81, 0.1);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #111827;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #374151;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4B5563;
+}
+
+.audit-entry {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.gold-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(201, 168, 76, 0.15) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out;
+}
+
+.topo-bg {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cpath d='M50 200 Q100 100 200 150 Q300 200 350 100' fill='none' stroke='%23C9A84C' stroke-width='0.5' opacity='0.05'/%3E%3Cpath d='M0 300 Q150 250 200 280 Q250 310 400 250' fill='none' stroke='%23C9A84C' stroke-width='0.5' opacity='0.04'/%3E%3Cpath d='M100 50 Q200 30 300 80 Q350 100 400 60' fill='none' stroke='%23C9A84C' stroke-width='0.5' opacity='0.03'/%3E%3Cpath d='M0 100 Q100 150 200 100 Q300 50 400 120' fill='none' stroke='%23C9A84C' stroke-width='0.5' opacity='0.04'/%3E%3Cpath d='M50 350 Q150 300 250 330 Q350 360 400 320' fill='none' stroke='%23C9A84C' stroke-width='0.5' opacity='0.03'/%3E%3C/svg%3E");
+  background-size: 400px 400px;
+  animation: topoDrift 60s linear infinite;
+}
+
+@keyframes topoDrift {
+  0% { background-position: 0 0; }
+  100% { background-position: 400px 400px; }
+}
+
+.watermark {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-35deg);
+  font-size: 48px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: rgba(241, 245, 249, 0.03);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 0;
+  user-select: none;
 }
